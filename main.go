@@ -17,7 +17,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"sort" 
+	"sort"
 	"strconv"
 	"sync"
 	"syscall"
@@ -34,12 +34,12 @@ const (
 var (
 	// --- ENV -----------------------------------------------------------------
 	registryURL   = getenv("REGISTRY_URL", "http://registry-server:5000")
-	keepN, _      = strconv.Atoi(getenv("KEEP_N", "10"))            // сколько тегов оставлять
+	keepN, _      = strconv.Atoi(getenv("KEEP_N", "10")) // сколько тегов оставлять
 	pruneEvery, _ = time.ParseDuration(getenv("PRUNE_INTERVAL", "24h"))
 	workers, _    = strconv.Atoi(getenv("WORKERS", "8"))
 	user          = os.Getenv("REGISTRY_USER") // basic-auth для prune (не нужен для GC)
 	pass          = os.Getenv("REGISTRY_PASS")
-	debounce      = time.Minute                // задержка после DELETE веб-хука
+	debounce      = time.Minute // задержка после DELETE веб-хука
 
 	// --- STATE ---------------------------------------------------------------
 	log      = logrus.New()
@@ -51,7 +51,9 @@ var (
 // ---   TYPES   --------------------------------------------------------------
 
 type envelope struct {
-	Events []struct{ Action string `json:"action"` } `json:"events"`
+	Events []struct {
+		Action string `json:"action"`
+	} `json:"events"`
 }
 
 // ---   MAIN   ---------------------------------------------------------------
@@ -264,7 +266,9 @@ func jsonDo(r *http.Request, out any) error {
 
 func catalog(ctx context.Context) ([]string, error) {
 	r, _ := req(ctx, "GET", "/v2/_catalog?n=10000")
-	var resp struct{ Repositories []string `json:"repositories"` }
+	var resp struct {
+		Repositories []string `json:"repositories"`
+	}
 	if err := jsonDo(r, &resp); err != nil {
 		return nil, err
 	}
@@ -273,7 +277,9 @@ func catalog(ctx context.Context) ([]string, error) {
 
 func tagsList(ctx context.Context, repo string) ([]string, error) {
 	r, _ := req(ctx, "GET", fmt.Sprintf("/v2/%s/tags/list", repo))
-	var resp struct{ Tags []string `json:"tags"` }
+	var resp struct {
+		Tags []string `json:"tags"`
+	}
 	if err := jsonDo(r, &resp); err != nil {
 		return nil, err
 	}
